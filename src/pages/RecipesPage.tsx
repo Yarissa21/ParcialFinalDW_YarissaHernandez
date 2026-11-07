@@ -53,10 +53,9 @@ function RecipesPage() {
   }
 
   const salir = () => {
-    // TODO 1.5 (Autenticación): cierre la sesión con logout() y vaya a /login con navigate.
-    void logout
-    void navigate
-  }
+  logout()
+  navigate('/login', { replace: true })
+}
 
   const totalPages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1
 

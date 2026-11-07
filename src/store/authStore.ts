@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import type { AuthUser, LoginResponse } from '../types'
 
 interface AuthState {
@@ -10,14 +11,19 @@ interface AuthState {
   logout: () => void
 }
 
-// TODO 1.2 (Autenticación): reemplace este store provisional por uno real con el middleware persist
-// (clave 'auth-storage'): setSession guarda usuario y tokens, setTokens actualiza solo los tokens
-// y logout los limpia.
-export const useAuthStore = create<AuthState>()(() => ({
-  user: null,
-  accessToken: null,
-  refreshToken: null,
-  setSession: () => {},
-  setTokens: () => {},
-  logout: () => {},
-}))
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+      setSession: (login) => {
+        const { accessToken, refreshToken, ...user } = login
+        set({ user, accessToken, refreshToken })
+      },
+      setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
+      logout: () => set({ user: null, accessToken: null, refreshToken: null }),
+    }),
+    { name: 'auth-storage' },
+  ),
+)
